@@ -8,8 +8,6 @@ var dateipfad  = path.join(__dirname, 'public', 'donate.html');
 app.set('port', (process.env.PORT || 5000))
 app.use(express.static(__dirname + '/public'))
 
-path.
-
 app.get('/', function(request, response) {
   response.sendFile(dateipfad)
 })
