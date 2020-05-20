@@ -1,0 +1,112 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>IKT III :: Barrierefreies Formular</title>
+</head>
+
+
+<body>
+
+<h1>IKT III :: Spendenformular</h1>
+<hr>
+<p>Gespendeter Betrag: <span id="counter">0</span></p>
+<p id="successMsg" style="color: #0B9213; font-weight: bold"></p>
+<p id="hintMsg" style="color: #df9c14; font-weight: bold"></p>
+<hr>
+
+<h2>Formular mit JS-Validierung</h2>
+<form id="form1">
+    <p><label for="form1_lastName">Nachname: </label><input onfocus="showTitleAsHint(this.title)" id="form1_lastName" title="Gib hier deinen Familiennamen ein"  type="text"></p>
+    <p><label for="form1_firstName">Vorname: </label><input onmouseover="showTitleAsHint(this.title)" id="form1_firstName" title="Gib hier deinen Vornamen ein" type="text"></p>
+    <p><label for="form1_email">E-Mail: </label><input onmouseover="showTitleAsHint(this.title)" id="form1_email" title="Gib hier deine Mailadresse in der Form max@mustermann.com ein" type="text"></p>
+    <p><label for="form1_amount">Betrag: </label><input onmouseover="showTitleAsHint(this.title)" id="form1_amount" title="Gib hier deinen Spendenbetrag in Euro ein" type="text"></p>
+    <p><label for="form1_reset">Reset</label> <input id="form1_reset" type="reset" title="Zurücksetzen" value="Reset"> <input onmouseover="showTitleAsHint(this.title)" id="form1_submit" type="button" value="Senden"></p>
+</form>
+
+<hr>
+
+<h2>Formular mit Auto-Validierung</h2>
+<form id="form2">
+    <p><label for="form2_lastName">Nachname: </label><input onmouseover="showTitleAsHint(this.title)" id="form2_lastName" type="text" title="Gib hier deinen Familiennamen ein" required></p>
+    <p><label for="form2_firstName">Vorname: </label><input onmouseover="showTitleAsHint(this.title)" id="form2_firstName"  type="text" title="Gib hier deinen Vornamen ein" required></p>
+    <p><label for="form2_email">E-Mail: </label><input onmouseover="showTitleAsHint(this.title)" id="form2_email"  type="email" title="Gib hier deine Mailadresse in der Form max@mustermann.com ein" required></p>
+    <p><label for="form2_amount">Betrag: </label><input onmouseover="showTitleAsHint(this.title)" id="form2_amount" type="number" min="1" title="Gib hier deinen Spendenbetrag in Euro ein" required></p>
+    <p><label for="form2_reset">Reset</label><input id="form2_reset" type="reset" title="Zurücksetzen" value="Reset"> <input onmouseover="showTitleAsHint(this.title)" id="form2_submit" type="button" value="Senden"></p>
+</form>
+
+</body>
+
+</html>
+
+<script type="application/javascript">
+
+    let counter = 0;
+
+    // --- Methods for checking ---
+    function checkLastName(lastname) {
+        if(lastname === "") throw new Error("Das Feld 'Nachname' darf nicht leer sein!");
+    }
+
+    function checkFirstName(lastname) {
+        if(lastname === "") throw new Error("Das Feld 'Vorname' darf nicht leer sein!");
+    }
+
+    function checkMail(mail) {
+        mail = String(mail);
+        if(!mail.includes('@')) throw new Error("Ungültige Mailadresse. Die Mailadresse muss ein '@' enthalten.");
+        if(!mail.includes('.')) throw new Error("Ungültige Mailadresse. Die Mailadresse muss einen Punk enthalten.");
+    }
+
+    function checkAmount(amount) {
+        amount = Number(amount);
+        if(amount === "") throw new Error("Der übergeben Wert darf nicht leer oder 0 sein!");
+        if(!Number.isInteger(amount)) throw new Error("Der übergebene Betrag darf kein Komma-Wert sein.");
+        if(amount < 1) throw new Error("Der übergebene Betrag muss größer als 0 sein.");
+    }
+
+    function undo(amount){
+        counter -= amount;
+        document.getElementById("counter").innerText = counter;
+    }
+
+    //Zeige den Text des Titel-Attributes zusätzlich bei MouseOver direkt unter der Überschriftenzeile
+    function showTitleAsHint(title){
+        document.getElementById("hintMsg").innerText = title;
+    }
+
+    function resetTitle(){
+        document.getElementById("hintMsg").innerText = "";
+    }
+
+    // ------
+
+    document.getElementById("form1_submit").onclick = function () {
+      let formData = document.getElementById("form1").elements;
+      try{
+          checkLastName(formData.namedItem("form1_lastName").value);
+          checkFirstName(formData.namedItem("form1_firstName").value);
+          checkMail(formData.namedItem("form1_email").value);
+          let amount = Number(formData.namedItem("form1_amount").value);
+          checkAmount(amount);
+          document.getElementById("counter").innerText = (counter += amount);
+          document.getElementById("successMsg").innerHTML = `Du hast erfolgreich ${amount} Euro gespendet. <button value='${amount}' onclick='undo(this.value)'>Rückgängig machen</button>`;
+      }catch (error){
+          alert(error);
+      }
+    };
+
+        document.getElementById("form2_submit").onclick = function () {
+            let amount = document.getElementById("form2").elements.namedItem("form2_amount").value;
+            amount = Number(amount);
+            document.getElementById("counter").innerText = (counter += amount);
+            document.getElementById("successMsg").innerHTML = `Du hast erfolgreich ${amount} Euro gespendet. <button value='${amount}' onclick='undo(this.value)'>Rückgängig machen</button>`;
+
+        };
+
+
+
+</script>
